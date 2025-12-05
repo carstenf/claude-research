@@ -1,0 +1,36 @@
+# Environment & Secrets
+.env
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# Docker volumes & data
+chroma_data/
+searxng/data/
+*.db
+*.sqlite
+
+# Reports (optional - can be committed if desired)
+# reports/
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# System
+.cache/

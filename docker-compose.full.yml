@@ -1,0 +1,74 @@
+# Full Docker Stack (use when production-ready)
+# Usage: docker-compose -f docker-compose.full.yml up -d
+
+version: '3.8'
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: research_searxng_prod
+    ports:
+      - "8888:8080"
+    volumes:
+      - ./searxng/settings:/etc/searxng:ro
+      - searxng_data:/var/cache/searxng
+    restart: unless-stopped
+    networks:
+      - research_net
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: research_chromadb_prod
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=False
+    restart: unless-stopped
+    networks:
+      - research_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  research_agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    container_name: research_agent_prod
+    depends_on:
+      searxng:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    volumes:
+      - ./domains:/app/domains
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+    environment:
+      - SEARXNG_URL=http://searxng:8080
+      - CHROMADB_URL=http://chromadb:8000
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-false}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY:-}
+    restart: unless-stopped
+    networks:
+      - research_net
+
+networks:
+  research_net:
+    driver: bridge
+
+volumes:
+  chroma_data:
+  searxng_data:

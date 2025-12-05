@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: research_searxng
+    ports:
+      - "8889:8080"
+    volumes:
+      - ./searxng/settings:/etc/searxng
+      - ./searxng/data:/var/cache/searxng
+    restart: unless-stopped
+    networks:
+      - research_net
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: research_chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=False
+    restart: unless-stopped
+    networks:
+      - research_net
+
+networks:
+  research_net:
+    driver: bridge
+
+volumes:
+  chroma_data:
+  searxng_data:
