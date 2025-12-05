@@ -1,183 +1,272 @@
-# Trading Strategy Research System
+# Claude Research System
 
-Agentic AI Research System für Trading-Strategien mit Hybrid RAG + Live Web Search.
+## 🎯 Konzept
 
-## 🏗️ Architektur
+**Ein Research-System OHNE teure API-Kosten - Claude übernimmt die intelligente Komponente!**
 
-**Hybrid-Ansatz:**
-- **Docker Services:** SearXNG (Search) + ChromaDB (Vector DB)
-- **Native Python:** Research Agents (während Development)
-- **Storage:** Domains mit PDFs, Vector Data, Metadata
+Anstatt eines autonomen Systems mit LLM API Keys ist dies ein **Claude-assisted Research System**:
+- **Du** gibst mir Research-Aufgaben
+- **Ich (Claude)** nutze die Tools auf deinem Server
+- **Du** erhältst strukturierte, analysierte Reports
 
-## 🚀 Quick Start
-
-### 1. Prerequisites
-
-```bash
-# Docker & Docker Compose installiert
-docker --version
-docker-compose --version
-
-# Python 3.11+
-python3 --version
+```
+You → "Recherchiere XYZ" → Claude
+                            ↓
+                    [SearXNG: Web Search]
+                    [ChromaDB: Document Storage]
+                    [web_fetch: Content Extraction]
+                            ↓
+                    Analysis & Synthesis
+                            ↓
+You ← Structured Report ← Claude
 ```
 
-### 2. Setup
+## ✅ Status: Vollständig Einsatzbereit
 
-```bash
-# Clone/Navigate to directory
-cd /home/carsten/research
+**Was läuft:**
+- ✅ **Docker v29.1.2** installiert
+- ✅ **SearXNG** (Port 8889) - Privacy-respecting meta-search engine
+- ✅ **ChromaDB** (Port 8000) - Vector database for documents
+- ✅ **Python Helper Scripts** - Tools for Claude to use
+- ✅ **Trading Strategies Domain** - Initialized and ready
 
-# Copy environment template
-cp .env.example .env
+**Deployed:**
+- ✅ Code auf GitHub: https://github.com/carstenf/claude-research
+- ✅ Services laufen auf Hetzner Server (128.140.104.236)
+- ✅ Vollständige Dokumentation vorhanden
 
-# Edit .env und füge deine API Keys ein
-nano .env
+## 🎯 Vorteile dieses Ansatzes
 
-# Install Python dependencies
-pip install --break-system-packages -r requirements.txt
+| Feature | Traditional Autonomous System | This Claude-Assisted System |
+|---------|------------------------------|----------------------------|
+| **API Costs** | €50-200/Monat | €0 (Claude is already here) |
+| **Quality Control** | Automated, hit-or-miss | Human-in-the-loop with Claude |
+| **Flexibility** | Fixed workflow | Interactive, adaptable |
+| **Context Understanding** | Limited by prompts | Full conversational context |
+| **Privacy** | Data sent to APIs | All on your server |
+| **Debugging** | Complex logs | Direct conversation |
 
-# Start Docker services
-docker-compose up -d
+## 🚀 Wie es funktioniert
 
-# Verify services
-docker ps
-curl http://localhost:8888  # SearXNG
-curl http://localhost:8000/api/v1/heartbeat  # ChromaDB
+### 1. Du gibst mir eine Aufgabe
+
+**Beispiele:**
+- "Recherchiere RSI Mean Reversion Strategien mit Backtest-Ergebnissen"
+- "Finde Papers über Momentum Trading in Crypto-Märkten"
+- "Analysiere aktuelle Entwicklungen bei 0DTE Options Trading"
+- "Fasse dieses PDF zusammen" (+ Upload)
+
+### 2. Ich nutze die Tools
+
+```python
+# Web Search via SearXNG
+python3 scripts/research_workflow.py search "RSI mean reversion backtest"
+
+# Content Extraction
+web_fetch(url)
+
+# Storage in ChromaDB
+store_content(collection="trading_strategies", content=..., metadata=...)
 ```
 
-### 3. Initialize Database
+### 3. Ich analysiere & synthetisiere
 
-```bash
-python3 scripts/init_db.py
-```
+- Bewerte Quellen-Qualität
+- Extrahiere Key Findings
+- Strukturiere die Informationen
+- Erstelle Code-Beispiele (wenn relevant)
 
-### 4. Run Research
+### 4. Du erhältst einen Report
 
-```bash
-python3 scripts/researcher.py "Recherchiere RSI Momentum Strategien"
-```
+- Zusammenfassung
+- Key Findings
+- Quellen mit Links
+- Praxisrelevante Insights
 
-## 📁 Directory Structure
+## 📂 Projekt-Struktur
 
 ```
 /home/carsten/research/
-├── docker-compose.yml           # Docker services
-├── requirements.txt             # Python dependencies
-├── .env                         # Configuration (not in git)
-├── .gitignore
-├── README.md
+├── docker-compose.yml          # Services (SearXNG, ChromaDB)
+├── requirements.txt            # Python dependencies
+├── .env.example               # Configuration template
+├── Makefile                   # Convenience commands
 │
-├── scripts/                     # Python code
-│   ├── researcher.py           # Main research agent
-│   ├── init_db.py              # Database initialization
-│   └── config.py               # Configuration
+├── scripts/
+│   ├── search_helper.py       # SearXNG wrapper
+│   ├── storage_helper.py      # ChromaDB wrapper
+│   ├── research_workflow.py   # Main workflow
+│   ├── init_db.py            # Database initialization
+│   └── config.py             # Configuration
 │
-├── domains/                     # Research domains (auto-created)
-│   ├── trading_strategies/
-│   │   ├── pdfs/
-│   │   ├── vector_db/
-│   │   └── metadata.db
-│   └── [weitere domains...]
+├── domains/
+│   └── trading_strategies/   # Research domain (initialized)
 │
-├── reports/                     # Generated reports
-├── searxng/                     # SearXNG config
-└── chroma_data/                 # ChromaDB data
+├── reports/                  # Generated reports
+├── searxng/                  # SearXNG config & data
+└── chroma_data/              # ChromaDB storage
+
+Documentation:
+├── README.md                 # This file
+├── CLAUDE_WORKFLOW.md        # Detailed workflow guide
+├── STATUS.md                 # Current system status
+└── GITHUB_DEPLOYMENT.md      # Deployment guide
 ```
 
-## 🔧 Development
+## 🔧 Quick Commands
 
 ### Services verwalten
-
 ```bash
-# Start services
-docker-compose up -d
+# Status prüfen
+sudo docker ps
 
-# Stop services
-docker-compose down
+# Logs ansehen
+sudo docker logs research_searxng
+sudo docker logs research_chromadb
 
-# View logs
-docker-compose logs -f searxng
-docker-compose logs -f chromadb
+# Services neustarten
+cd /home/carsten/research
+sudo docker compose restart
 
-# Restart services
-docker-compose restart
+# Services stoppen/starten
+sudo docker compose down
+sudo docker compose up -d
 ```
 
-### Python Development
-
+### Research durchführen
 ```bash
-# Code bearbeiten
-nano scripts/researcher.py
+# Suche starten
+cd /home/carsten/research
+python3 scripts/research_workflow.py search "your query"
 
-# Direkt ausführen (kein Docker rebuild nötig)
-python3 scripts/researcher.py "Query"
-
-# Debuggen mit pdb
-python3 -m pdb scripts/researcher.py
+# Direkt als JSON
+python3 scripts/search_helper.py "your query"
 ```
 
-## 📊 System Status
-
+### Domains verwalten
 ```bash
-# Check services
-curl http://localhost:8888/search?q=test&format=json
-curl http://localhost:8000/api/v1/heartbeat
+# Neue Domain erstellen
+mkdir -p domains/new_topic
+python3 scripts/init_db.py new_topic
 
-# Database size
-du -sh domains/
-du -sh chroma_data/
-
-# Docker stats
-docker stats
+# Aktuelle Domains
+ls -l domains/
 ```
 
-## 🎯 Next Steps
+## 📋 Typischer Research-Flow
 
-1. ✅ Services laufen (SearXNG + ChromaDB)
-2. 🔧 Implement LangGraph Workflow
-3. 🔧 Add Domain Auto-Detection
-4. 🔧 Integrate MCP Server
-5. 🚀 Production: Full Docker Stack
+**Beispiel: Trading Strategy Research**
 
-## 📚 Documentation
+1. **Du:** "Finde Papers über RSI Mean Reversion mit empirischen Backtest-Ergebnissen"
 
-- [Concept PDF](docs/Trading_Research_System_Konzept.pdf)
-- [Architecture](docs/architecture.md) (TODO)
-- [API Reference](docs/api.md) (TODO)
+2. **Ich (Claude):**
+   - Suche via SearXNG: "RSI mean reversion empirical backtest results"
+   - Fetche Top 5-10 URLs mit web_fetch
+   - Analysiere Methodologie, Parameter, Performance
+   - Extrahiere Key Findings
 
-## 🐛 Troubleshooting
+3. **Du erhältst:**
+   ```markdown
+   # RSI Mean Reversion Strategy Research
+   
+   ## Zusammenfassung
+   [Kompakte Übersicht der Findings]
+   
+   ## Key Findings
+   - Optimale RSI-Schwellenwerte: 30/70 vs 20/80
+   - Performance-Metriken aus 5 Studies
+   - Asset Class Unterschiede
+   
+   ## Quellen
+   1. [Paper Title](url) - Key takeaway
+   2. [Blog Post](url) - Implementation details
+   ...
+   
+   ## Code-Beispiel (wenn relevant)
+   ```python
+   # Implementation
+   ```
+   ```
 
-**SearXNG nicht erreichbar:**
+## 🎯 Use Cases
+
+### Primary (70%): Trading Strategy Research
+- Backtest-Results für verschiedene Strategien
+- Paper-Analysen zu Momentum, Mean Reversion, etc.
+- Performance-Vergleiche
+- Implementation Details
+
+### Secondary (30%): General Research
+- VW Turbo-Prämie Details
+- Health Insurance Tariff Analysis
+- Technical Documentation
+- iOS Development Workflows
+
+## 🔐 Sicherheit & Privacy
+
+- ✅ Alle Services laufen auf deinem eigenen Server
+- ✅ Keine Daten gehen zu externen LLM APIs
+- ✅ SearXNG respektiert Privacy (keine Tracking)
+- ✅ Sensitive Daten in `.gitignore` ausgeschlossen
+- ✅ `.env` mit Secrets nicht im Git
+
+## 📊 System Requirements
+
+**Minimal (aktuell):**
+- Docker: ~500MB RAM für beide Services
+- Disk: ~1GB für Images + Data
+- CPU: Minimal (Search ist I/O-bound)
+
+**Dein Server:**
+- 32GB Speicher verfügbar
+- Ubuntu 24
+- Docker v29.1.2
+- Python 3.12.3
+
+## 🚀 Deployment
+
+Das System ist bereits deployed und läuft!
+
+**Services:**
+- SearXNG: http://128.140.104.236:8889
+- ChromaDB: http://localhost:8000
+
+**Für Updates:**
 ```bash
-docker logs research_searxng
-docker restart research_searxng
+cd /home/carsten/research
+git add .
+git commit -m "Update: description"
+git push
 ```
 
-**ChromaDB Issues:**
-```bash
-docker logs research_chromadb
-# Check permissions
-ls -la chroma_data/
-```
+## 📖 Weitere Dokumentation
 
-**Python Dependencies:**
-```bash
-pip install --break-system-packages --upgrade -r requirements.txt
-```
+- **[CLAUDE_WORKFLOW.md](CLAUDE_WORKFLOW.md)** - Detaillierter Workflow-Guide
+- **[STATUS.md](STATUS.md)** - Aktueller System-Status
+- **[GITHUB_DEPLOYMENT.md](GITHUB_DEPLOYMENT.md)** - Deployment-Anleitung
 
-## 📝 Status
+## 💡 Warum dieser Ansatz?
 
-- [x] Project Setup
-- [x] Docker Services
-- [ ] Python Research Agent
-- [ ] LangGraph Integration
-- [ ] Domain Management
-- [ ] MCP Server Integration
-- [ ] Production Docker Image
+**Claude ist bereits verfügbar** - warum sollte man zusätzlich für LLM API Calls bezahlen?
+
+Stattdessen:
+- Ich nutze die Tools auf deinem Server
+- Du behältst volle Kontrolle
+- Wir können iterativ verfeinern
+- Bessere Qualität durch Kontext-Verständnis
+- Null zusätzliche Kosten
+
+Das System bietet mir (Claude) die Werkzeuge, die ich brauche, um für dich zu recherchieren. Es ist wie ein Research-Assistent, der Zugang zu einer Bibliothek und dem Internet hat.
+
+## 🎉 Ready to Use!
+
+**Das System ist einsatzbereit!**
+
+Gib mir einfach eine Research-Aufgabe und ich lege los!
 
 ---
 
-**Version:** 0.1.0 (Development)  
-**Status:** 🚧 In Development  
-**Deployment:** When stable → GitHub Repository
+**Version:** 1.0.0  
+**Status:** ✅ Production Ready  
+**Last Updated:** 2025-12-05  
+**Repository:** https://github.com/carstenf/claude-research
